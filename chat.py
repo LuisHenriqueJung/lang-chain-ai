@@ -39,7 +39,7 @@ def meu_app():
     st.title("Chat com OpenAI")
     st.header("LuIA - O Assistente de IA",divider=True)
     st.markdown("### Converse com o luIA, seu assistente de IA personalizado.")
-    modelId = st.selectbox("Escolha o modelo de linguagem:", options=["deepseek-ai/DeepSeek-R1-Distill-Qwen-32B","meta-llama/Llama-3.1-8B-Instruct"], key="modelId")
+    modelId = st.selectbox("Escolha o modelo de linguagem:", options=["deepseek-ai/DeepSeek-R1-Distill-Qwen-32B","meta-llama/Llama-3.1-8B-Instruct","openai/gpt-oss-20b"], key="modelId")
     prompt = st.chat_input("Digite a sua mensagem:")
     
     abrir_chat(prompt,modelId,messages)
