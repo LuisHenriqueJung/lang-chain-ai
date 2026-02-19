@@ -16,19 +16,21 @@ class Avaliacao(BaseModel):
     pontos_positivos: list[str] = Field(description="quais os principais pontos positivos dessa avaliação? (cada ponto em no máximo 3 palavras, se houver)")
     pontos_negativos: list[str] = Field(description="quais os principais pontos negativos dessa avaliação? (cada ponto em no máximo 3 palavras, se houver)")
     
-parser = JsonOutputParser(name="avaliacao_usuario", pydantic_object=Avaliacao)
+class AvaliacoesList(BaseModel):
+    avaliacoes: list[Avaliacao] = Field(description="lista de avaliações extraídas dos reviews")
+    
+parser = JsonOutputParser(name="avaliacao_usuario", pydantic_object=AvaliacoesList)
 instrucoes = parser.get_format_instructions()
 
 
-context_template = PromptTemplate.from_template("Você está avaliando reviews de um usuários sobre um produto, preciso de algumas informações extraídas desses reviews: {review}")
+context_template = PromptTemplate.from_template("Você está avaliando reviews de varios usuários sobre um produto, preciso de algumas informações extraídas desses reviews: {reviews}")
 language_template = PromptTemplate.from_template("Responda sempre em {idioma}", partial_variables={"idioma": "português"})
 format_template = PromptTemplate.from_template("Formato da resposta: {formato}", partial_variables={"formato": instrucoes})
 final_template = ( context_template + language_template + format_template)
 
-for review in reviews:
-    prompt = final_template.invoke({"review": review})
-    modelo = ChatOpenAI()
-    resposta = modelo.invoke(prompt)
-    resposta = parser.invoke(resposta)
-    print(resposta)
+modelo = ChatOpenAI()
+prompt = final_template.invoke({"reviews": reviews})
+resposta = modelo.invoke(prompt)
+resposta = parser.invoke(resposta)
+print(resposta)
     
