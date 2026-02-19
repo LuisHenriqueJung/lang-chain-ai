@@ -29,8 +29,14 @@ format_template = PromptTemplate.from_template("Formato da resposta: {formato}",
 final_template = ( context_template + language_template + format_template)
 
 modelo = ChatOpenAI()
-prompt = final_template.invoke({"reviews": reviews})
-resposta = modelo.invoke(prompt)
-resposta = parser.invoke(resposta)
-print(resposta)
+
+chain = final_template | modelo | parser
+
+resposta = chain.invoke({"reviews": reviews})
+
+
+with open("review.txt", "w", encoding="utf-8") as f:
+    for review in resposta["avaliacoes"]:
+        f.write(f"{review}")
+        f.write("\n")
     
