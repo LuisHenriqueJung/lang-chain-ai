@@ -9,9 +9,9 @@ messages = [
     ]
 
 model = ChatOpenAI()
-
-prompt = input("Enter your prompt: ")
-messages.append(HumanMessage(content=prompt))
-response = model.invoke(messages, max_tokens=140, temperature=0.7, stop=["\n"])
-print(response.content)
-print(response.usage_metadata)
+if __name__ == "__main__":
+    prompt = input("Enter your prompt: ")
+    messages.append(HumanMessage(content=prompt))
+    response = model.invoke(messages, max_tokens=140, temperature=0.7, stop=["\n"])
+    print(response.content)
+    print(response.usage_metadata)
