@@ -7,6 +7,7 @@ reviews = ["Eu gostei bastante da câmera é a primeira vez que eu tiro foto com
 from langchain_core.prompts import PromptTemplate
 from langchain_openai import ChatOpenAI
 from langchain_core.output_parsers import JsonOutputParser, StrOutputParser
+from langchain_core.runnables import RunnableLambda
 from pydantic import BaseModel, Field
 from dotenv import load_dotenv
 
@@ -37,12 +38,13 @@ review_formatter_chain = final_template | modelo | parser
 
 #review_formatter_response = review_formatter_chain.invoke({"reviews": reviews})
 
+def salvar_arquivo(dict_avaliacoes):
+    with open("avaliacoes.txt", "w", encoding="utf-8") as f:
+        for avaliacao in dict_avaliacoes["avaliacoes"]:
+            f.write(f"{avaliacao}\n")
+    return dict_avaliacoes
 
-#with open("review.txt", "w", encoding="utf-8") as f:
-#    for review in review_formatter_response["avaliacoes"]:
- #       f.write(f"{review}")
-#        f.write("\n")
-    
+runnable_salvar_arquivo = RunnableLambda(salvar_arquivo)
 #-------------------------------------------------------------------------------------------------#
 
 template_analise = PromptTemplate.from_template("""Analise a seguinte lista de reviews de um produto e me diga:
@@ -57,7 +59,7 @@ text_parser = StrOutputParser()
 analysis_chain = template_analise | modelo | text_parser
 #analysis_response = analysis_chain.invoke({"avaliacoes": review_formatter_response})
 
-global_chain = review_formatter_chain | analysis_chain
+global_chain = review_formatter_chain | runnable_salvar_arquivo | analysis_chain
 response = global_chain.invoke({"reviews": reviews})
 
 print(response)
