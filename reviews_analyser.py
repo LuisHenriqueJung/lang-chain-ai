@@ -8,6 +8,9 @@ from langchain_core.prompts import PromptTemplate
 from langchain_openai import ChatOpenAI
 from langchain_core.output_parsers import JsonOutputParser, StrOutputParser
 from pydantic import BaseModel, Field
+from dotenv import load_dotenv
+
+load_dotenv()
 
 class Avaliacao(BaseModel):
     "Review foi enviado por um cliente que comprou um produto, preciso avaliar esse produto para saber se ele é bom e se vale a pena, identificar os pontos positivos e negativos do produto, e se a avaliação é positiva ou negativa."
@@ -32,13 +35,13 @@ modelo = ChatOpenAI()
 
 review_formatter_chain = final_template | modelo | parser
 
-review_formatter_response = review_formatter_chain.invoke({"reviews": reviews})
+#review_formatter_response = review_formatter_chain.invoke({"reviews": reviews})
 
 
-with open("review.txt", "w", encoding="utf-8") as f:
-    for review in review_formatter_response["avaliacoes"]:
-        f.write(f"{review}")
-        f.write("\n")
+#with open("review.txt", "w", encoding="utf-8") as f:
+#    for review in review_formatter_response["avaliacoes"]:
+ #       f.write(f"{review}")
+#        f.write("\n")
     
 #-------------------------------------------------------------------------------------------------#
 
@@ -52,6 +55,9 @@ A lista de reviews é essa: {avaliacoes}
 text_parser = StrOutputParser()
 
 analysis_chain = template_analise | modelo | text_parser
-analysis_response = analysis_chain.invoke({"avaliacoes": review_formatter_response})
+#analysis_response = analysis_chain.invoke({"avaliacoes": review_formatter_response})
 
-print(analysis_response)
+global_chain = review_formatter_chain | analysis_chain
+response = global_chain.invoke({"reviews": reviews})
+
+print(response)
