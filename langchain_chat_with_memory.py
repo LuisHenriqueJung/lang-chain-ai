@@ -14,7 +14,6 @@ requests.request = patched_request
 
 def abrir_chat(prompt,with_memory_chain,chats):
     tema = st.selectbox("Escolha o tema da conversa:", options=["Programação em Python","Matemática","História"])
-    print(tema)
     config = {"configurable": {"session_id": tema}} 
     if prompt:
         with_memory_chain.invoke({"message": prompt,"tema": tema},config=config)
