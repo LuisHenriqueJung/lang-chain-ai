@@ -6,7 +6,7 @@ reviews = ["Eu gostei bastante da câmera é a primeira vez que eu tiro foto com
 
 from langchain_core.prompts import PromptTemplate
 from langchain_openai import ChatOpenAI
-from langchain_core.output_parsers import JsonOutputParser
+from langchain_core.output_parsers import JsonOutputParser, StrOutputParser
 from pydantic import BaseModel, Field
 
 class Avaliacao(BaseModel):
@@ -30,13 +30,28 @@ final_template = ( context_template + language_template + format_template)
 
 modelo = ChatOpenAI()
 
-chain = final_template | modelo | parser
+review_formatter_chain = final_template | modelo | parser
 
-resposta = chain.invoke({"reviews": reviews})
+review_formatter_response = review_formatter_chain.invoke({"reviews": reviews})
 
 
 with open("review.txt", "w", encoding="utf-8") as f:
-    for review in resposta["avaliacoes"]:
+    for review in review_formatter_response["avaliacoes"]:
         f.write(f"{review}")
         f.write("\n")
     
+#-------------------------------------------------------------------------------------------------#
+
+template_analise = PromptTemplate.from_template("""Analise a seguinte lista de reviews de um produto e me diga:
+1. Quantas reviews são positivas e quantas são negativas (e o percentual de reviews positivas do total)
+2. Qual percentual de reviews diz que vale a pena comprar o produto
+3. O ponto positivo que mais aparece e o ponto negativo que mais aparece.
+A lista de reviews é essa: {avaliacoes}
+""")
+
+text_parser = StrOutputParser()
+
+analysis_chain = template_analise | modelo | text_parser
+analysis_response = analysis_chain.invoke({"avaliacoes": review_formatter_response})
+
+print(analysis_response)
