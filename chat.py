@@ -1,6 +1,9 @@
 import streamlit as st
 from langchain_core.messages import HumanMessage
 import requests
+import torch
+
+torch.classes.__path__ = []
 
 old_request = requests.request
 
@@ -11,17 +14,22 @@ def patched_request(method, url, **kwargs):
 
 requests.request = patched_request
 
-from modelo_huggingface import model, messages
+from modelo_huggingface import get_model, model, messages
 
-def abrir_chat(prompt,model,messages):
+def abrir_chat(prompt,modelId,messages):
     if 'messages' in st.session_state:
         messages = st.session_state['messages']
     else:
         st.session_state['messages'] = messages
     if prompt:
         messages.append(HumanMessage(content=prompt))
-        response = model.invoke(messages)
-        messages.append(response)
+        st.spinner("Aguarde a resposta do modelo...")
+        response = get_model(modelId).invoke(messages)
+        print(response)
+        if '</think>' in response.content:
+            messages.append(HumanMessage(content=response.content.split('</think>')[1]))
+        else:
+            messages.append(response)
     for message in messages:
         if message.type != "system":
             with st.chat_message(message.type):
@@ -31,9 +39,9 @@ def meu_app():
     st.title("Chat com OpenAI")
     st.header("LuIA - O Assistente de IA",divider=True)
     st.markdown("### Converse com o luIA, seu assistente de IA personalizado.")
-    
+    modelId = st.selectbox("Escolha o modelo de linguagem:", options=["deepseek-ai/DeepSeek-R1-Distill-Qwen-32B","meta-llama/Llama-3.1-8B-Instruct"], key="modelId")
     prompt = st.chat_input("Digite a sua mensagem:")
     
-    abrir_chat(prompt,model,messages)
+    abrir_chat(prompt,modelId,messages)
         
 meu_app()

@@ -15,8 +15,13 @@ llm = HuggingFaceEndpoint(
 )
 
 model = ChatHuggingFace(llm=llm)
+
+def get_model(llmId):
+    llm = HuggingFaceEndpoint(
+        repo_id=llmId,
+    )
+    return ChatHuggingFace(llm=llm)
 if __name__ == "__main__":
     prompt = input("Digite a sua mensagem: ")  # Test prompt instead of input
     messages.append(HumanMessage(content=prompt))
     response = model.invoke(messages)
-    print("Response content:", response.content)
