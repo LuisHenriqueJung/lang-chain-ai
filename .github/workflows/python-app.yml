@@ -28,6 +28,16 @@ jobs:
         python -m pip install --upgrade pip
         pip install flake8 pytest
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+    - name: Run Streamlit App
+      run: |
+        timeout 30 streamlit run langchain_chat_with_memory.py
+        if [ $? -eq 124 ]; then
+          echo "App started successfully, timed out as expected"
+          exit 0
+        else
+          echo "App failed to start or exited early"
+          exit 1
+        fi
     - name: Lint with flake8
       run: |
         # stop the build if there are Python syntax errors or undefined names
