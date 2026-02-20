@@ -1,12 +1,10 @@
 import streamlit as st
 from langchain_core.messages import HumanMessage, AIMessage, AIMessageChunk, ToolMessage
 import requests
-import torch
 import json
 import os
 
 from long_term_memory import agent
-torch.classes.__path__ = []
 
 old_request = requests.request
 
