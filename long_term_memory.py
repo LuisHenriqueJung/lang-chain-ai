@@ -33,19 +33,3 @@ agent = create_agent(
     tools=[get_user_info, save_user_info],
     store=store
 )
-
-# First session: save user info
-#result = agent.invoke({
-#    "messages": [{"role": "user", "content": "Save the following user: userid: abc123, name: Foo, age: 25, email: foo@langchain.dev"}]
-#})
-#print(result)
-
-# Second session: get user info
-#result = agent.invoke({
-#    "messages": [{"role": "user", "content": "Get user info for user with id 'abc123'"}]
-#})
-#print(result)
-# Here is the user info for user with ID "abc123":
-# - Name: Foo
-# - Age: 25
-# - Email: foo@langchain.dev
